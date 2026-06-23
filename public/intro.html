@@ -163,11 +163,36 @@
 
   .diagram {
     display: grid;
-    grid-template-columns: minmax(0, auto) auto auto auto minmax(0, auto);
+    grid-template-columns: auto auto auto auto auto;
+    grid-template-rows: auto auto;
     align-items: center;
-    gap: clamp(0.75rem, 1.8vw, 1.75rem);
+    column-gap: clamp(1rem, 2.4vw, 2.5rem);
+    row-gap: 0.85rem;
+    width: fit-content;
     padding: 0.5rem 0;
   }
+
+  /* Column headers: let the slide read on its own */
+  .col-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    align-self: end;
+    padding-bottom: 0.15rem;
+  }
+
+  .col-label--src   { grid-column: 1; grid-row: 1; }
+  .col-label--model { grid-column: 3; grid-row: 1; justify-self: center; }
+  .col-label--ans   { grid-column: 5; grid-row: 1; }
+
+  .sources { grid-column: 1; grid-row: 2; }
+  .flow--1 { grid-column: 2; grid-row: 2; }
+  .model   { grid-column: 3; grid-row: 2; }
+  .flow--2 { grid-column: 4; grid-row: 2; }
+  .answer  { grid-column: 5; grid-row: 2; }
 
   .sources {
     display: grid;
@@ -222,17 +247,27 @@
   .slide-bias .source.weight-quiet .vol { width: 28px; background: var(--ink-ghost); }
 
   .slide-bias .source.weight-silent {
-    color: var(--ink-ghost);
+    color: var(--ink-faint);
     font-style: italic;
     border-left-color: var(--hairline);
+    border-left-style: dotted;
     background: var(--paper);
   }
-  .slide-bias .source.weight-silent .vol { width: 8px; background: var(--ink-ghost); opacity: 0.5; }
+  /* Hollow bar: present in the room, absent from the data */
+  .slide-bias .source.weight-silent .vol {
+    width: 18px;
+    background: transparent;
+    border: 1px dotted var(--ink-faint);
+    height: 8px;
+    opacity: 0.7;
+  }
 
   .flow {
     font-family: var(--mono);
-    font-size: 1.25rem;
-    color: var(--ink-faint);
+    font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1;
+    color: var(--ink-soft);
     user-select: none;
   }
 
@@ -383,14 +418,19 @@
   /* ── Narrow screens ── */
   @media (max-width: 820px) {
     .diagram {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0.75rem;
-      justify-items: start;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: 0.4rem;
     }
-    .flow {
-      transform: rotate(90deg);
-      padding: 0.25rem 0;
-    }
+    .col-label--src   { order: 1; }
+    .sources          { order: 2; }
+    .col-label--model { order: 3; margin-top: 0.6rem; }
+    .model            { order: 4; }
+    .col-label--ans   { order: 5; margin-top: 0.6rem; }
+    .answer           { order: 6; }
+    .flow { display: none; }
     .answer, .model { max-width: none; width: 100%; }
     .footer {
       grid-template-columns: 1fr;
@@ -421,6 +461,9 @@
         <p class="question-text">"Does this person qualify for SNAP?"</p>
       </div>
       <div class="diagram">
+        <span class="col-label col-label--src">Training data</span>
+        <span class="col-label col-label--model">The model</span>
+        <span class="col-label col-label--ans">The answer</span>
         <div class="sources">
           <div class="source"><span>Court rulings</span><span class="vol" aria-hidden="true"></span></div>
           <div class="source"><span>Eligibility manuals</span><span class="vol" aria-hidden="true"></span></div>
@@ -430,9 +473,9 @@
           <div class="source"><span>Wikipedia entries</span><span class="vol" aria-hidden="true"></span></div>
           <div class="source"><span>State agency PDFs</span><span class="vol" aria-hidden="true"></span></div>
         </div>
-        <span class="flow" aria-hidden="true">→</span>
+        <span class="flow flow--1" aria-hidden="true">→</span>
         <div class="model">LLM</div>
-        <span class="flow" aria-hidden="true">→</span>
+        <span class="flow flow--2" aria-hidden="true">→</span>
         <div class="answer">"Yes. 92% confident."</div>
       </div>
       <p class="slide-caption">A Google search would show me the sources to weigh myself. The LLM blends them invisibly, then hands me one answer with a confidence number on it.</p>
@@ -446,6 +489,9 @@
         <p class="question-text">"Does this person qualify for SNAP?"</p>
       </div>
       <div class="diagram">
+        <span class="col-label col-label--src">Training data, by volume</span>
+        <span class="col-label col-label--model">The model</span>
+        <span class="col-label col-label--ans">The answer</span>
         <div class="sources">
           <div class="source weight-loud"><span>Court rulings</span><span class="vol" aria-hidden="true"></span></div>
           <div class="source weight-loud"><span>Eligibility manuals</span><span class="vol" aria-hidden="true"></span></div>
@@ -455,9 +501,9 @@
           <div class="source weight-silent"><span>The people the rules apply to</span><span class="vol" aria-hidden="true"></span></div>
           <div class="source weight-silent"><span>The library volunteer who helped my mom</span><span class="vol" aria-hidden="true"></span></div>
         </div>
-        <span class="flow" aria-hidden="true">→</span>
+        <span class="flow flow--1" aria-hidden="true">→</span>
         <div class="model">LLM</div>
-        <span class="flow" aria-hidden="true">→</span>
+        <span class="flow flow--2" aria-hidden="true">→</span>
         <div class="answer">"Yes. 92% confident."</div>
       </div>
       <p class="slide-caption">The blend tips toward whoever's loudest in the training data. The answer is institutionally biased before I ever see it, and the confidence score gives no sign of it.</p>
